@@ -1,5 +1,5 @@
 AC_PREREQ(2.53)
-AC_INIT(moblin-panel-myzone, 0.0.4)
+AC_INIT(moblin-panel-myzone, 0.0.5)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_CONFIG_HEADER(config.h)
 
