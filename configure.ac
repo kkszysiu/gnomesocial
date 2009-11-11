@@ -32,6 +32,7 @@ PKG_CHECK_MODULES(PENGE,
                   libjana-ecal
                   mojito-client
                   gtk+-2.0 >= 2.14
+                  bickley-0.4
                   nbtk-1.2
                   gconf-2.0
                   gio-2.0
