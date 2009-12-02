@@ -38,7 +38,6 @@ PKG_CHECK_MODULES(PENGE,
                   mojito-client
                   gtk+-2.0 >= 2.14
                   bickley-0.4
-                  nbtk-1.2
                   mx-1.0
                   gconf-2.0
                   gio-2.0
