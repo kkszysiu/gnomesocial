@@ -24,10 +24,15 @@ AC_PROG_LIBTOOL
 AC_ISC_POSIX
 AC_HEADER_STDC
 AM_PROG_CC_C_O
+AC_PROG_LN_S
 
 CFLAGS="$CFLAGS -Wall"
 
-PKG_CHECK_MODULES(MPL, moblin-panel)
+PKG_CHECK_MODULES(MPL, moblin-panel >= 0.50.0)
+
+MOBLIN_PANELS_DIR=`$PKG_CONFIG --variable=moblin_panel_panels_dir moblin-panel`
+AC_SUBST(MOBLIN_PANELS_DIR)
+
 PKG_CHECK_MODULES(PENGE,
                   libjana-ecal
                   mojito-client
