@@ -58,6 +58,13 @@ AS_IF([test "x$enable_cache" = "xyes"],
 
 AM_CONDITIONAL([ENABLE_CACHE],   [test "x$enable_cache" = "xyes"])
 
+AC_ARG_ENABLE([moblin-desktop-file],
+              [AC_HELP_STRING([--disable-moblin-desktop-file],
+                              [Disable installation of moblin desktop file])],
+              [enable_mdesktop=$enableval],
+              [enable_mdesktop=yes])
+
+AM_CONDITIONAL([ENABLE_MOBLIN_DESKTOP_FILE], [test "x$enable_mdesktop" = "xyes"])
 AC_OUTPUT([
         Makefile
         penge/Makefile
