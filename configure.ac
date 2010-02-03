@@ -35,7 +35,7 @@ AC_SUBST(MOBLIN_PANELS_DIR)
 
 PKG_CHECK_MODULES(PENGE,
                   libjana-ecal
-                  mojito-client
+                  libsocialweb-client
                   gtk+-2.0 >= 2.14
                   bickley-0.4
                   mx-1.0
