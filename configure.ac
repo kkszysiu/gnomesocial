@@ -44,7 +44,10 @@ PKG_CHECK_MODULES(PENGE,
                   gio-2.0
                   gio-unix-2.0)
 
-
+PKG_CHECK_MODULES(MAILME,
+                  gobject-2.0
+                  glib-2.0
+                  telepathy-glib >= 0.10)
 
 AC_ARG_ENABLE([cache],
               [AC_HELP_STRING([--enable-cache],
@@ -97,6 +100,7 @@ AM_GCONF_SOURCE_2
 AC_OUTPUT([
         Makefile
         penge/Makefile
+        mailme/Makefile
         src/Makefile
         data/Makefile
         data/moblin-panel-myzone.schemas
