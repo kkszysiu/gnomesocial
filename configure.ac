@@ -26,6 +26,8 @@ AC_HEADER_STDC
 AM_PROG_CC_C_O
 AC_PROG_LN_S
 
+AC_SUBST(PENGE_VERSION, [0.1])
+
 CFLAGS="$CFLAGS -Wall"
 
 PKG_CHECK_MODULES(MPL, moblin-panel >= 0.50.0)
@@ -71,4 +73,5 @@ AC_OUTPUT([
         data/Makefile
         data/theme/Makefile
         po/Makefile.in
+        penge.pc
 ])

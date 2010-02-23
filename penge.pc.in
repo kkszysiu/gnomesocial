@@ -1,0 +1,14 @@
+prefix=@prefix@
+libdir=@libdir@
+includedir=@includedir@
+pkgincludedir=${includedir}/moblin-panel-myzone
+
+# The requirements list is kind of guesswork at
+# the moment.  Add more requirements as needed.
+
+Name: Penge tiles
+Description: Penge tiles from Moblin panel myzone
+Version: @PENGE_VERSION@
+Requires: libsocialweb-client
+Libs: -L${libdir} -lpenge
+Cflags: -I${pkgincludedir}
