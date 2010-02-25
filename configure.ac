@@ -44,6 +44,16 @@ PKG_CHECK_MODULES(PENGE,
                   gio-2.0
                   gio-unix-2.0)
 
+PKG_CHECK_MODULES(CAPPLET,
+                  gconf-2.0
+                  gtk+-2.0 >= 2.14
+                  mx-gtk-1.0
+                  gio-unix-2.0
+                  libgnome-control-center-extension)
+
+EXTENSIONSDIR=$($PKG_CONFIG libgnome-control-center-extension --variable=extensiondir)
+AC_SUBST(EXTENSIONSDIR)
+
 AC_ARG_ENABLE([cache],
               [AC_HELP_STRING([--enable-cache],
                               [Enable Nbtk image cache generation])],
