@@ -82,6 +82,7 @@ AC_OUTPUT([
         src/Makefile
         data/Makefile
         data/theme/Makefile
+        capplet/Makefile
         po/Makefile.in
         penge.pc
 ])
