@@ -44,15 +44,7 @@ PKG_CHECK_MODULES(PENGE,
                   gio-2.0
                   gio-unix-2.0)
 
-PKG_CHECK_MODULES(CAPPLET,
-                  gconf-2.0
-                  gtk+-2.0 >= 2.14
-                  mx-gtk-1.0
-                  gio-unix-2.0
-                  libgnome-control-center-extension)
 
-EXTENSIONSDIR=$($PKG_CONFIG libgnome-control-center-extension --variable=extensiondir)
-AC_SUBST(EXTENSIONSDIR)
 
 AC_ARG_ENABLE([cache],
               [AC_HELP_STRING([--enable-cache],
@@ -75,7 +67,31 @@ AC_ARG_ENABLE([moblin-desktop-file],
               [enable_mdesktop=$enableval],
               [enable_mdesktop=yes])
 
+
 AM_CONDITIONAL([ENABLE_MOBLIN_DESKTOP_FILE], [test "x$enable_mdesktop" = "xyes"])
+
+AC_ARG_ENABLE([capplet],
+              [AC_HELP_STRING([--disable-capplet],
+                              [Disable the building of the capplet])],
+              [enable_cappled=$enableval],
+              [enable_capplet=yes])
+
+
+AM_CONDITIONAL([ENABLE_CAPPLET], [test "x$enable_capplet" = "xyes"])
+
+AS_IF([test "x$enable_capplet" = "xyes"],
+      [
+      PKG_CHECK_MODULES(CAPPLET,
+                        gconf-2.0
+                        gtk+-2.0 >= 2.14
+                        mx-gtk-1.0
+                        gio-unix-2.0
+                        libgnome-control-center-extension)
+
+      EXTENSIONSDIR=$($PKG_CONFIG libgnome-control-center-extension --variable=extensiondir)
+      AC_SUBST(EXTENSIONSDIR)
+])
+
 AC_OUTPUT([
         Makefile
         penge/Makefile
