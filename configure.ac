@@ -92,11 +92,14 @@ AS_IF([test "x$enable_capplet" = "xyes"],
       AC_SUBST(EXTENSIONSDIR)
 ])
 
+AM_GCONF_SOURCE_2
+
 AC_OUTPUT([
         Makefile
         penge/Makefile
         src/Makefile
         data/Makefile
+        data/moblin-panel-myzone.schemas
         data/theme/Makefile
         capplet/Makefile
         po/Makefile.in
