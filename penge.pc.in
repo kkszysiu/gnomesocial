@@ -7,6 +7,6 @@ pkgincludedir=${includedir}/moblin-panel-myzone
 Name: Penge tiles
 Description: Penge tiles from Moblin panel myzone
 Version: @PENGE_VERSION@
-Requires: libsocialweb-client clutter-1.0 mx-1.0 libjana-ecal
-Libs: -L${libdir} -lpenge
+Requires: libsocialweb-client clutter-1.0 mx-1.0 libjana-ecal telepathy-glib
+Libs: -L${libdir} -lpenge -ltelepathy-glib
 Cflags: -I${pkgincludedir}
