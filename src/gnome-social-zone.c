@@ -30,6 +30,65 @@
 static GTimer *profile_timer = NULL;
 static guint stage_paint_idle = 0;
 
+/* Our menu, an array of GtkItemFactoryEntry structures that defines each menu item */
+static GtkItemFactoryEntry menu_items[] = {
+    { "/_Zone",             NULL,           NULL,               0, "<Branch>" },
+    { "/Zone/_New",         "<control>N",   NULL,               0, "<StockItem>", GTK_STOCK_NEW },
+    { "/Zone/_Open",        "<control>O",   NULL,               0, "<StockItem>", GTK_STOCK_OPEN },
+    { "/Zone/_Save",        "<control>S",   NULL,               0, "<StockItem>", GTK_STOCK_SAVE },
+    { "/Zone/Save _As",     NULL,           NULL,               0, "<Item>" },
+    { "/Zone/sep1",         NULL,           NULL,               0, "<Separator>" },
+    { "/Zone/_Quit",        "<CTRL>Q",      gtk_main_quit,      0, "<StockItem>", GTK_STOCK_QUIT },
+    { "/_Options",          NULL,           NULL,               0, "<Branch>" },
+    { "/Options/tear",      NULL,           NULL,               0, "<Tearoff>" },
+    { "/Options/Check",     NULL,           NULL,               1, "<CheckItem>" },
+    { "/Options/sep",       NULL,           NULL,               0, "<Separator>" },
+    { "/Options/Rad1",      NULL,           NULL,               1, "<RadioItem>" },
+    { "/Options/Rad2",      NULL,           NULL,               2, "/Options/Rad1" },
+    { "/Options/Rad3",      NULL,           NULL,               3, "/Options/Rad1" },
+    { "/_Help",             NULL,           NULL,               0, "<LastBranch>" },
+    { "/_Help/About",       NULL,           NULL,               0, "<Item>" },
+};
+
+static gint nmenu_items = sizeof (menu_items) / sizeof (menu_items[0]);
+
+/* Returns a menubar widget made from the above menu */
+static GtkWidget *get_menubar_menu(GtkWidget *window)
+{
+    GtkItemFactory *item_factory;
+    GtkAccelGroup *accel_group;
+
+    accel_group = gtk_accel_group_new ();
+
+    item_factory = gtk_item_factory_new (GTK_TYPE_MENU_BAR, "<main>",
+                                       accel_group);
+
+    gtk_item_factory_create_items (item_factory, nmenu_items, menu_items, NULL);
+
+    gtk_window_add_accel_group (GTK_WINDOW (window), accel_group);
+
+    return gtk_item_factory_get_widget (item_factory, "<main>");
+}
+
+static GtkWidget *get_text_panel(void)
+{
+    GtkWidget *textview;
+
+    textview = gtk_text_view_new ();
+    gtk_text_view_set_editable (GTK_TEXT_VIEW (textview), TRUE);
+    gtk_text_view_set_accepts_tab (GTK_TEXT_VIEW (textview), TRUE);
+    gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW (textview), TRUE);
+    gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (textview), GTK_WRAP_WORD_CHAR);
+    gtk_text_view_set_left_margin (GTK_TEXT_VIEW (textview), 2);
+    gtk_text_view_set_right_margin (GTK_TEXT_VIEW (textview), 2);
+    gtk_text_view_set_pixels_above_lines (GTK_TEXT_VIEW (textview), 2);
+    gtk_text_view_set_pixels_below_lines (GTK_TEXT_VIEW (textview), 2);
+    
+    gtk_container_set_border_width(GTK_CONTAINER(textview), 5);
+
+    return textview;
+}
+
 static void _stage_paint_cb (ClutterActor *actor,
                              gpointer      userdata);
 
@@ -62,9 +121,8 @@ int
 main (int    argc,
       char **argv)
 {
-  GtkWidget *window, *embed;
+  GtkWidget *window, *embed, *vbox, *menubar, *vpaned, *textpanel;
   ClutterActor *stage, *grid_view;
-  GError *error = NULL;
 
   setlocale (LC_ALL, "");
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
@@ -76,18 +134,35 @@ main (int    argc,
 
   clutter_init (&argc, &argv);
   gtk_init(&argc, &argv);
+  g_set_application_name("GNOME Social Zone");
   
     mx_style_load_from_file (mx_style_get_default (),
                            THEMEDIR "/panel.css", NULL);
 
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title (GTK_WINDOW (window), _("GNOME Social Zone"));
+    gtk_window_set_icon_name (GTK_WINDOW (window), "gnome-social-zone");
+    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
     g_signal_connect (window, "destroy",
                     G_CALLBACK (gtk_main_quit),
                     NULL);
+                    
+    vbox = gtk_vbox_new(FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(window), vbox);
+    
+    menubar = get_menubar_menu (GTK_WIDGET(window));
+    vpaned = gtk_vpaned_new ();
+    
+    gtk_box_pack_start(GTK_BOX (vbox), menubar, FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX (vbox), vpaned, TRUE, TRUE, 0);
 
     embed = gtk_clutter_embed_new ();
-    gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(embed));
-    gtk_widget_show (embed);
+    
+    gtk_paned_pack1 (GTK_PANED (vpaned), GTK_WIDGET(embed), FALSE, FALSE);
+    
+    textpanel = get_text_panel();
+
+    gtk_paned_pack2 (GTK_PANED (vpaned), textpanel, TRUE, TRUE);
 
     stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (embed));
     clutter_actor_realize (stage);
@@ -101,7 +176,7 @@ main (int    argc,
     gtk_widget_set_size_request (embed, 1016, 536);
     
     clutter_actor_show_all (stage);
-
+    
     gtk_widget_show_all (GTK_WIDGET(window));
     
   g_signal_connect_after (stage,
