@@ -5,11 +5,6 @@ SUBDIRS=theme
 desktopfiles_in_files=moblin-panel-myzone.desktop.in
 desktopfiles_files=$(desktopfiles_in_files:.desktop.in=.desktop)
 
-if ENABLE_MOBLIN_DESKTOP_FILE
-panelfilesdir=$(MOBLIN_PANELS_DIR)/
-panelfiles_DATA = $(desktopfiles_files)
-endif
-
 settingsfiles_in_files=myzone.desktop.in
 settingsfiles_files=$(settingsfiles_in_files:.desktop.in=.desktop)
 settingsdir = $(datadir)/applications
@@ -22,11 +17,6 @@ settings_DATA = $(settingsfiles_files)
 autostartdir = $(sysconfdir)/xdg/autostart
 autostart_DATA = $(desktopfiles_files)
 
-if ENABLE_CAPPLET
-uidir = $(pkgdatadir)
-ui_DATA = capplet.ui
-endif
-
 schemadir = $(GCONF_SCHEMA_FILE_DIR)
 schema_DATA = moblin-panel-myzone.schemas
 
@@ -37,6 +27,6 @@ if GCONF_SCHEMAS_INSTALL
 	fi
 endif
 
-EXTRA_DIST = moblin-panel-myzone.desktop.in.in myzone.desktop.in.in moblin-panel-myzone.schemas.in capplet.ui
+EXTRA_DIST = moblin-panel-myzone.desktop.in.in myzone.desktop.in.in moblin-panel-myzone.schemas.in
 CLEANFILES = moblin-panel-myzone.desktop moblin-panel-myzone.desktop.in \
 	     myzone.desktop myzone.desktop.in

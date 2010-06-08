@@ -1,23 +1,19 @@
 QUIET_GEN = $(Q:@=@echo '  GEN   '$@;)
 
 AM_CFLAGS = \
-	    $(PENGE_CFLAGS) \
-	    $(MPL_CFLAGS) \
+	    $(SOCIALZONE_CFLAGS) \
 	    -I$(top_srcdir) \
 	    -DLOCALEDIR=\"$(localedir)\" \
-	    -DNBTK_CACHE=\"$(pkgdatadir)/nbtk.cache\" \
 	    -DTHEMEDIR=\"$(pkgdatadir)/theme\"
 
-libexec_PROGRAMS = moblin-panel-myzone
+libexec_PROGRAMS = gnome-social-zone
 
-moblin_panel_myzone_LDADD = \
-			    $(top_builddir)/penge/libpenge.la \
-			    $(PENGE_LIBS) \
-			    $(MAILME_LIBS) \
-			    $(MPL_LIBS)
+gnome_social_zone_LDADD = \
+			    $(top_builddir)/socialzone/libsocialzone.la \
+			    $(SOCIALZONE_LIBS)
 
-moblin_panel_myzone_SOURCES = \
-  moblin-panel-myzone.c
+gnome_social_zone_SOURCES = \
+  gnome-social-zone.c
 
 servicedir = $(datadir)/dbus-1/services
 service_in_files = org.moblin.UX.Shell.Panels.myzone.service.in
