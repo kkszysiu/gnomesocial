@@ -21,46 +21,14 @@
 #include <config.h>
 #include <glib/gi18n-lib.h>
 #include <clutter/clutter.h>
-#include <clutter/x11/clutter-x11.h>
-#include <gdk/gdkx.h>
+#include <clutter-gtk/clutter-gtk.h>
 #include <gtk/gtk.h>
 #include <mx/mx.h>
-#include <moblin-panel/mpl-panel-clutter.h>
-#include <moblin-panel/mpl-panel-common.h>
 #include <penge/penge-grid-view.h>
-
-#include <gconf/gconf-client.h>
-
-#define MOBLIN_MYZONE_DIR "/desktop/moblin/myzone"
 
 
 static GTimer *profile_timer = NULL;
 static guint stage_paint_idle = 0;
-
-static void
-_client_set_size_cb (MplPanelClient *client,
-                     guint           width,
-                     guint           height,
-                     gpointer        userdata)
-{
-  clutter_actor_set_size ((ClutterActor *)userdata,
-                          width,
-                          height);
-}
-
-static void
-_grid_view_activated_cb (PengeGridView *grid_view,
-                         gpointer       userdata)
-{
-  mpl_panel_client_hide ((MplPanelClient *)userdata);
-}
-
-static gboolean standalone = FALSE;
-
-static GOptionEntry entries[] = {
-  {"standalone", 's', 0, G_OPTION_ARG_NONE, &standalone, "Do not embed into the mutter-moblin panel", NULL},
-  { NULL }
-};
 
 static void _stage_paint_cb (ClutterActor *actor,
                              gpointer      userdata);
@@ -94,12 +62,9 @@ int
 main (int    argc,
       char **argv)
 {
-  MplPanelClient *client;
-  ClutterActor *stage;
-  ClutterActor *grid_view;
-  GOptionContext *context;
+  GtkWidget *window, *embed;
+  ClutterActor *stage, *grid_view;
   GError *error = NULL;
-  GConfClient *gconf_client;
 
   setlocale (LC_ALL, "");
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
@@ -109,93 +74,44 @@ main (int    argc,
   g_thread_init (NULL);
   profile_timer = g_timer_new ();
 
-  context = g_option_context_new ("- mutter-moblin myzone panel");
-  g_option_context_add_main_entries (context, entries, GETTEXT_PACKAGE);
-  g_option_context_add_group (context, clutter_get_option_group_without_init ());
-  g_option_context_add_group (context, cogl_get_option_group ());
-  g_option_context_add_group (context, gtk_get_option_group (FALSE));
-  if (!g_option_context_parse (context, &argc, &argv, &error))
-  {
-    g_critical (G_STRLOC ": Error parsing option: %s", error->message);
-    g_clear_error (&error);
-  }
-  g_option_context_free (context);
-
-  MPL_PANEL_CLUTTER_INIT_WITH_GTK (&argc, &argv);
-#if 0
-  nbtk_texture_cache_load_cache (nbtk_texture_cache_get_default (),
-                                 NBTK_CACHE);
-#endif
-  mx_style_load_from_file (mx_style_get_default (),
+  clutter_init (&argc, &argv);
+  gtk_init(&argc, &argv);
+  
+    mx_style_load_from_file (mx_style_get_default (),
                            THEMEDIR "/panel.css", NULL);
 
-  if (!standalone)
-  {
-    client = mpl_panel_clutter_new ("myzone",
-                                    "myzone",
-                                    NULL,
-                                    "myzone-button",
-                                    TRUE);
+    window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    g_signal_connect (window, "destroy",
+                    G_CALLBACK (gtk_main_quit),
+                    NULL);
 
-    MPL_PANEL_CLUTTER_SETUP_EVENTS_WITH_GTK (client);
+    embed = gtk_clutter_embed_new ();
+    gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(embed));
+    gtk_widget_show (embed);
 
-    stage = mpl_panel_clutter_get_stage (MPL_PANEL_CLUTTER (client));
-
-    grid_view = g_object_new (PENGE_TYPE_GRID_VIEW,
-                              "panel-client",
-                              client,
-                              NULL);
-    clutter_container_add_actor (CLUTTER_CONTAINER (stage),
-                                 (ClutterActor *)grid_view);
-    g_signal_connect (client,
-                      "set-size",
-                      (GCallback)_client_set_size_cb,
-                      grid_view);
-
-    g_signal_connect (grid_view,
-                      "activated",
-                      (GCallback)_grid_view_activated_cb,
-                      client);
-  } else {
-    Window xwin;
-
-    stage = clutter_stage_get_default ();
+    stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (embed));
     clutter_actor_realize (stage);
-    xwin = clutter_x11_get_stage_window (CLUTTER_STAGE (stage));
-
-    MPL_PANEL_CLUTTER_SETUP_EVENTS_WITH_GTK_FOR_XID (xwin);
-
+    
     grid_view = g_object_new (PENGE_TYPE_GRID_VIEW,
                               NULL);
+    
     clutter_container_add_actor (CLUTTER_CONTAINER (stage),
                                  (ClutterActor *)grid_view);
     clutter_actor_set_size ((ClutterActor *)grid_view, 1016, 536);
-    clutter_actor_set_size (stage, 1016, 536);
+    gtk_widget_set_size_request (embed, 1016, 536);
+    
     clutter_actor_show_all (stage);
-  }
 
+    gtk_widget_show_all (GTK_WIDGET(window));
+    
   g_signal_connect_after (stage,
                           "paint",
                           (GCallback)_stage_paint_cb,
                           NULL);
 
-  gconf_client = gconf_client_get_default ();
-  gconf_client_add_dir (gconf_client,
-                        MOBLIN_MYZONE_DIR,
-                        GCONF_CLIENT_PRELOAD_ONELEVEL,
-                        &error);
-
-  if (error)
-  {
-    g_warning (G_STRLOC ": Error setting up gconf key directory: %s",
-               error->message);
-    g_clear_error (&error);
-  }
-
   g_message (G_STRLOC ": PROFILE: Main loop started: %f",
              g_timer_elapsed (profile_timer, NULL));
-  clutter_main ();
-  g_object_unref (gconf_client);
+  gtk_main();
 
   return 0;
 }
